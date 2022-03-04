@@ -254,12 +254,11 @@ class EmuHelper():
 
         if samplePath is not None:
 
-            try:
-                if self.verifyIDBFile(samplePath):
+            if self.verifyIDBFile(samplePath):
+                try:
                     import flare_emu_idb
-            except Exception as e:
-                self.logger.error("error importing flare_emu_idb: %s" % e)
-                return
+                except Exception as e:
+                    self.logger.error("error importing flare_emu_idb: %s" % e)
 
             try:
                 import flare_emu_radare
