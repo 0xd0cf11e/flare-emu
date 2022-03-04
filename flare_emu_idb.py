@@ -1,6 +1,5 @@
 import flare_emu
 import idb
-import logging
 import re
 
 class PythonIDBAnalysisHelper(flare_emu.AnalysisHelper):

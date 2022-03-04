@@ -253,6 +253,14 @@ class EmuHelper():
         self.hookData = {}
 
         if samplePath is not None:
+
+            try:
+                if self.verifyIDBFile(samplePath):
+                    import flare_emu_idb
+            except Exception as e:
+                self.logger.error("error importing flare_emu_idb: %s" % e)
+                return
+
             try:
                 import flare_emu_radare
             except Exception as e:
@@ -283,6 +291,11 @@ class EmuHelper():
             self._cloneEmuMem(emuHelper)
         else:
             self.reloadBinary()
+
+    def verifyIDBFile(self, samplePath):
+        if (samplePath[:-4] == ".idb") or (samplePath[:4] == ".i64"):
+            return True
+        return False
 
     # startAddr: address to start emulation
     # endAddr: address to end emulation, this instruction is not executed. 
