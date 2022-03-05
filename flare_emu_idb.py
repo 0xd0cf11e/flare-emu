@@ -3,20 +3,22 @@ import idb
 import re
 
 class PythonIDBAnalysisHelper(flare_emu.AnalysisHelper):
-    def __init__(self, fp):
+    def __init__(self, sample):
         super(PythonIDBAnalysisHelper, self).__init__()
         #self.fp = fp
-        db = idb.from_file(fp)
+        with open(sample, 'rb') as f:
+            buffer = f.read()
+        db = idb.from_buffer(buffer)
         api = idb.IDAPython(db)
         self.idautils = api.idautils
         self.idaapi = api.idaapi
         self.idc = api.idc
 
         info = self.idaapi.get_inf_structure()
-        if info.procName == "metapc":
+        if info.procname == "metapc":
             self.arch = "X86"
         else:
-            self.arch = info.procName
+            self.arch = info.procname
         if info.is_64bit():
             self.bitness = 64
         elif info.is_32bit():    
