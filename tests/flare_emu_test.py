@@ -15,8 +15,10 @@
 ############################################
 
 from __future__ import print_function
-import flare_emu
 import sys
+sys.path.append('.')
+
+import flare_emu
 import logging
 
 from unicorn import UC_ARCH_X86, UC_MEM_READ, UC_MEM_WRITE

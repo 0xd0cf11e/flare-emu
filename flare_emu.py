@@ -16,6 +16,7 @@
 ############################################
 
 from __future__ import print_function
+from random import sample
 import unicorn
 import unicorn.x86_const
 import unicorn.arm_const
@@ -253,19 +254,32 @@ class EmuHelper():
         self.hookData = {}
 
         if samplePath is not None:
-            try:
-                import flare_emu_radare
-            except Exception as e:
-                self.logger.error("error importing flare_emu_radare: %s" % e)
-                return
+
+            is_idb = self.verifyIDBFile(samplePath)
+
+            if is_idb:
+                try:
+                    import flare_emu_idb
+                except Exception as e:
+                    self.logger.error("error importing flare_emu_idb: %s" % e)
+                    return
+            else:
+                try:
+                    import flare_emu_radare
+                except Exception as e:
+                    self.logger.error("error importing flare_emu_radare: %s" % e)
+                    return
                 
             # copy Radare2AnalysisHelper to skip reanalyzing binary and save time
             if emuHelper is not None:
                 self.analysisHelper = emuHelper.analysisHelper
                 self.analysisHelper.eh = self
+            elif is_idb:
+                self.analysisHelper = flare_emu_idb.PythonIDBAnalysisHelper(sample=samplePath)
+                self.analysisHelperFramework = "python-idb"
             else:
                 self.analysisHelper = flare_emu_radare.Radare2AnalysisHelper(samplePath, self)
-            self.analysisHelperFramework = "Radare2"
+                self.analysisHelperFramework = "Radare2"
         else:
             try:
                 import flare_emu_ida
@@ -283,6 +297,12 @@ class EmuHelper():
             self._cloneEmuMem(emuHelper)
         else:
             self.reloadBinary()
+
+    def verifyIDBFile(self, samplePath):
+        #print(samplePath[-4:])
+        if (samplePath[-4:] == ".idb") or (samplePath[-4:] == ".i64"):
+            return True
+        return False
 
     # startAddr: address to start emulation
     # endAddr: address to end emulation, this instruction is not executed. 
